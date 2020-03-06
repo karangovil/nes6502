@@ -22,11 +22,12 @@ install:
   - cd lcov
   - sudo make install
   - cd ..
-  - mkdir cmake_dir && cd cmake_dir
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
   - travis_retry wget --no-check-certificate https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5-Linux-x86_64.tar.gz
   - tar -xvf cmake-3.16.5-Linux-x86_64.tar.gz > /dev/null
   - mv cmake-3.16.5-Linux-x86_64 cmake-install
-  - PATH=${cmake_dir}/cmake-install:${cmake_dir}/cmake-install/bin:$PATH
+  - PATH=${DEPS_DIR}/cmake-install:${DEPS_DIR}/cmake-install/bin:$PATH
   - cd ..
 
 script:

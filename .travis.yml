@@ -14,7 +14,8 @@ install:
   - sudo apt-get install -qq g++-9
   - sudo apt-get install -qq gcc-9
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
-  -  sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
+  - sudo apt-get install cmake
   - sudo apt-get install libperlio-gzip-perl
   - sudo apt-get install libjson-perl
   - git clone https://github.com/linux-test-project/lcov.git

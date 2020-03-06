@@ -1,0 +1,42 @@
+language: cpp
+compiler: gcc
+dist: bionic
+
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+  - sudo wget http://downloads.sourceforge.net/ltp/lcov-1.14.tar.gz
+  #- tar -xvf lcov-1.14.tar.gz
+  #- cd lcov-1.14 && sudo make install
+  #- cd ..
+
+install: 
+  - sudo apt-get install -qq g++-9
+  - sudo apt-get install -qq gcc-9
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
+  -  sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90
+  - sudo apt-get install libperlio-gzip-perl
+  - sudo apt-get install libjson-perl
+  - git clone https://github.com/linux-test-project/lcov.git
+  - cd lcov
+  - sudo make install
+  - cd ..
+
+script:
+  - export CODECOV_TOKEN="c30d709d-2ae8-4b64-9cca-e38d646efee3"
+  - mkdir -p build && cd build
+  - cmake -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTING=OFF ..
+  - cmake --build . --config Debug -- -j $(nproc)
+  - ctest -j $(nproc) --output-on-failure
+  - sh build.sh
+
+after_success:
+# Create lcov report
+# capture coverage info
+  - lcov --gcov-tool /usr/bin/gcov-9 --capture --directory . --output-file coverage.info --no-external
+# filter out system and extra files.
+  - lcov --remove coverage.info '/usr/*' '*/libs/*' '*/tests/*' --output-file coverage.info
+# output coverage data for debugging
+  - lcov --list coverage.info
+  # Uploading report to CodeCov
+  - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"

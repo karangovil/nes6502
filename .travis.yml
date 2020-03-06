@@ -36,7 +36,6 @@ script:
   - cmake -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTING=OFF ..
   - cmake --build . --config Debug -- -j $(nproc)
   - ctest -j $(nproc) --output-on-failure
-  - sh build.sh
 
 after_success:
 # Create lcov report

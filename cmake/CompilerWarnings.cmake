@@ -4,7 +4,7 @@
 # lable.md
 
 function(set_project_warnings project_name)
-  option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" TRUE)
+    option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
   set(CLANG_WARNINGS
       -Wall

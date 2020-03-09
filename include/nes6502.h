@@ -30,10 +30,10 @@ public:
   uint8_t x = 0x00;// X register
   uint8_t y = 0x00;// Y register
   uint8_t stkp = 0x00;// Stack pointer (points to location on bus)
-  uint8_t pc = 0x00;// Program counter
+  uint16_t pc = 0x00;// Program counter
   uint8_t status = 0x00;// Status register
 
-  void ConnectBus(Bus *n) { bus = n; }
+  void ConnectBus(Bus *b) { bus = b; }
 
   // clang-format off
   // Addressing modes

@@ -22,6 +22,11 @@ enable_sanitizers(project_options)
 # allow for static analysis options
 include(cmake/StaticAnalyzers.cmake)
 
+# libraries for olcPixelGameEngine
+add_library(olc_pge INTERFACE)
+target_link_libraries(olc_pge INTERFACE X11 GL pthread png stdc++fs)
+target_include_directories(olc_pge INTERFACE olcPixelGameEngine)
+
 option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
 option(ENABLE_TESTING "Enable Test Builds" ON)
 

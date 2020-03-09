@@ -1,5 +1,6 @@
 #include "nes6502.h"
 #include "Bus.h"
+#include "utils.h"
 
 nes6502::nes6502()
 {
@@ -9,14 +10,14 @@ nes6502::~nes6502()
 {
 }
 
-uint8_t nes6502::read(uint16_t a)
+uint8_t nes6502::read(uint16_t addr)
 {
-  return bus->read(a, false);
+  return bus->read(addr, false);
 }
 
-void nes6502::write(uint16_t a, uint8_t d)
+void nes6502::write(uint16_t addr, uint8_t data)
 {
-  bus->write(a, d);
+  bus->write(addr, data);
 }
 
 void nes6502::clock()
@@ -327,7 +328,7 @@ uint8_t nes6502::ADC()
   // will exist in bit 8 of 16 bit word
   temp = (uint16_t)a + (uint16_t)fetched + (uint16_t)GetFlag(C);
   // carry flag out exists in the HI bit 0
-  SetFlag(C, temp < 255);
+  SetFlag(C, temp > 255);
   SetFlag(Z, (temp & 0x00FF) == 0x0000);
   // set the signed overflow flag
   SetFlag(V, (~((uint16_t)a ^ (uint16_t)fetched) & ((uint16_t)a ^ (uint16_t)temp)) & 0x0080);
@@ -391,6 +392,17 @@ uint8_t nes6502::ORA()
   SetFlag(Z, a == 0x00);
   SetFlag(N, a & 0x80);
   return 1;
+}
+
+// Test bits in memory with accumulator
+uint8_t nes6502::BIT()
+{
+  fetch();
+  temp = a & fetched;
+  SetFlag(Z, (temp & 0x00FF) == 0x00);
+  SetFlag(N, fetched & (1 << 7));
+  SetFlag(V, fetched & (1 << 6));
+  return 0;
 }
 
 // Branch if Carry set
@@ -716,7 +728,24 @@ uint8_t nes6502::LDY()
   return 1;
 }
 
-// Left shift
+// Shift left one bit
+// shift one bt right (memory or accumulator)
+uint8_t nes6502::ASL()
+{
+  fetch();
+  temp = (uint16_t)fetched << 1;
+  SetFlag(C, (temp & 0xFF00) > 0);
+  SetFlag(Z, (temp & 0x00FF) == 0x00);
+  SetFlag(N, temp & 0x80);
+  if (lookup[opcode].addrmode == &nes6502::IMP)
+    a = temp & 0x00FF;
+  else
+    write(addr_abs, temp & 0x00FF);
+  return 0;
+}
+
+// Logical Shift right
+// shift one bt right (memory or accumulator)
 uint8_t nes6502::LSR()
 {
   fetch();
@@ -971,14 +1000,6 @@ std::map<uint16_t, std::string> nes6502::disassemble(uint16_t nStart, uint16_t n
   uint8_t hi = 0x00;
   std::map<uint16_t, std::string> mapLines;
   uint16_t line_addr = 0;
-
-  // converet variables into hex strings
-  auto hex = [](uint32_t n, uint8_t d) {
-    std::string s(d, '0');
-    for (int i = d - 1; i >= 0; i--, n >>= 4)
-      s[i] = "0123456789ABCDEF"[n & 0xF];
-    return s;
-  };
 
   while (addr <= (uint32_t)nStop) {
     line_addr = addr;

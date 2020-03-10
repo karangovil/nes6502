@@ -28,7 +28,7 @@ public:
     for (int row = 0; row < nRows; ++row) {
       std::string sOffset = "$" + hex(nAddr, 4) + ":";
       for (int col = 0; col < nCols; ++col) {
-        sOffset += " " + hex(bus.read(nAddr, true), 2);
+        sOffset += " " + hex(bus.cpuRead(nAddr, true), 2);
         nAddr += 1;
       }
 
@@ -112,12 +112,12 @@ public:
     while (!ss.eof()) {
       std::string b;
       ss >> b;
-      bus.ram[nOffset++] = (uint8_t)std::stoul(b, nullptr, 16);
+      bus.cpuRam[nOffset++] = (uint8_t)std::stoul(b, nullptr, 16);
     }
 
     // Set reset vector
-    bus.ram[0xFFFC] = 0x00;
-    bus.ram[0xFFFD] = 0x80;
+    bus.cpuRam[0xFFFC] = 0x00;
+    bus.cpuRam[0xFFFD] = 0x80;
 
     // Extract disassembly
     mapAsm = bus.cpu.disassemble(0x0000, 0xFFFF);

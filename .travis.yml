@@ -25,6 +25,10 @@ install:
   - sudo apt-get install cmake
   - sudo apt-get install libperlio-gzip-perl
   - sudo apt-get install libjson-perl
+  - sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
+  - sudo apt-get install libpthread-stubs0-dev
+  - sudo apt-get install libpng-dev
+  - 
   - git clone https://github.com/linux-test-project/lcov.git
   - cd lcov
   - sudo make install
